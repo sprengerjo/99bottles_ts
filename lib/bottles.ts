@@ -1,4 +1,4 @@
-import { downTo } from './helpers';
+import { downTo, capitalize } from './helpers';
 
 export class Bottles {
 
@@ -7,37 +7,37 @@ export class Bottles {
     }
     verses(max: number, min: number): string {
         return downTo(max, min)
-            .map(this.verse)
+            .map(number => this.verse(number))
             .join('\n');
     }
     verse(number: number): string {
-        let result;
+        const result = `${this.quantity(number)} ${this.container(number)} of beer on the wall, ` +
+            `${this.quantity(number)} ${this.container(number)} of beer.\n` +
+            `${this.action(number)}` +
+            `${this.quantity(this.successor(number))} ${this.container(this.successor(number))} of beer on the wall.\n`;
 
-        if (number === 0) {
-            result =
-                'No more bottles of beer on the wall, ' +
-                'no more bottles of beer.\n' +
-                'Go to the store and buy some more, ' +
-                '99 bottles of beer on the wall.\n';
-        } else if (number === 1) {
-            result =
-                '1 bottle of beer on the wall, ' +
-                '1 bottle of beer.\n' +
-                'Take it down and pass it around, ' +
-                'no more bottles of beer on the wall.\n';
-        } else if (number === 2) {
-            result =
-                '2 bottles of beer on the wall, ' +
-                '2 bottles of beer.\n' +
-                'Take one down and pass it around, ' +
-                '1 bottle of beer on the wall.\n';
-        } else {
-            result = `${number} bottles of beer on the wall, ` +
-                `${number} bottles of beer.\n` +
-                'Take one down and pass it around, ' +
-                `${number - 1} bottles of beer on the wall.\n`;
-        }
-        return result
+        return capitalize(result)
     }
+
+    container(number: number): string {
+        return number === 1 ? 'bottle' : 'bottles';
+    }
+
+    quantity(number: number): string {
+        return number === 0 ? 'no more' : number.toString();
+    }
+
+    pronoun(number: number): string {
+        return number === 1 ? 'it' : 'one';
+    }
+
+    action(number: number): string {
+        return number === 0 ? 'Go to the store and buy some more, ' : `Take ${this.pronoun(number)} down and pass it around, `;
+    }
+
+    successor(number: number): number {
+        return number === 0 ? 99 : number - 1;
+    }
+
 }
 
