@@ -11,33 +11,79 @@ export class Bottles {
             .join('\n');
     }
     verse(number: number): string {
-        const result = `${this.quantity(number)} ${this.container(number)} of beer on the wall, ` +
-            `${this.quantity(number)} ${this.container(number)} of beer.\n` +
-            `${this.action(number)}` +
-            `${this.quantity(this.successor(number))} ${this.container(this.successor(number))} of beer on the wall.\n`;
+        const bottleNumber = BottleNumber.for(number);
+
+        const result = `${bottleNumber} of beer on the wall, ` +
+            `${bottleNumber} of beer.\n` +
+            `${bottleNumber.action()}` +
+            `${bottleNumber.successor()} of beer on the wall.\n`;
 
         return capitalize(result)
     }
-
-    container(number: number): string {
-        return number === 1 ? 'bottle' : 'bottles';
-    }
-
-    quantity(number: number): string {
-        return number === 0 ? 'no more' : number.toString();
-    }
-
-    pronoun(number: number): string {
-        return number === 1 ? 'it' : 'one';
-    }
-
-    action(number: number): string {
-        return number === 0 ? 'Go to the store and buy some more, ' : `Take ${this.pronoun(number)} down and pass it around, `;
-    }
-
-    successor(number: number): number {
-        return number === 0 ? 99 : number - 1;
-    }
-
 }
 
+class BottleNumber {
+
+    static for<T extends BottleNumber>(number: number): T | BottleNumber {
+        let BottleNumberClass;
+
+        if (number === 0) {
+            BottleNumberClass = BottleNumber0;
+        } else if (number === 1) {
+            BottleNumberClass = BottleNumber1;
+        } else {
+            BottleNumberClass = BottleNumber;
+        }
+        return new BottleNumberClass(number);
+    }
+
+    constructor(private number: number) { }
+
+    container(): string {
+        return 'bottles';
+    }
+
+    quantity(): string {
+        return this.number.toString();
+    }
+
+    successor() {
+        return BottleNumber.for(this.number - 1);
+    }
+    
+    action(): string {
+        return `Take ${this.pronoun()} down and pass it around, `;
+    }
+    
+    toString() {
+        return `${this.quantity()} ${this.container()}`;
+    }
+    
+    protected pronoun(): string {
+        return 'one';
+    }
+}
+
+class BottleNumber0 extends BottleNumber {
+    quantity(): string {
+        return 'no more';
+    }
+    
+    successor() {
+        return BottleNumber.for(99);
+    }
+
+    action(): string {
+        return 'Go to the store and buy some more, ';
+    }
+}
+
+class BottleNumber1 extends BottleNumber {
+    container(): string {
+        return 'bottle';
+    }
+
+    protected pronoun(): string {
+        return 'it';
+    }
+}
