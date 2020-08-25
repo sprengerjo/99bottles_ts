@@ -31,6 +31,8 @@ class BottleNumner {
             BottleNumberClass = BottleNumber0;
         } else if (number === 1) {
             BottleNumberClass = BottleNumber1;
+        } else if (number === 6) {
+            BottleNumberClass = BottleNumber6;
         } else {
             BottleNumberClass = BottleNumner;
         }
@@ -46,7 +48,7 @@ class BottleNumner {
     quantity(): string {
         return this.number.toString();
     }
-
+    
     successor() {
         return BottleNumner.for(this.number - 1);
     }
@@ -72,7 +74,7 @@ class BottleNumber0 extends BottleNumner {
     successor() {
         return BottleNumner.for(99);
     }
-
+    
     action(): string {
         return 'Go to the store and buy some more, ';
     }
@@ -82,8 +84,17 @@ class BottleNumber1 extends BottleNumner {
     container(): string {
         return 'bottle';
     }
-
+    
     protected pronoun(): string {
         return 'it';
+    }
+}
+class BottleNumber6 extends BottleNumner {
+    container(): string {
+        return 'six-pack';
+    }
+
+    quantity(): string {
+        return '1';
     }
 }
