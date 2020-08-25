@@ -11,7 +11,7 @@ export class Bottles {
             .join('\n');
     }
     verse(number: number): string {
-        const bottleNumber = BottleNumner.for(number);
+        const bottleNumber = BottleNumber.for(number);
 
         const result = `${bottleNumber} of beer on the wall, ` +
             `${bottleNumber} of beer.\n` +
@@ -22,17 +22,19 @@ export class Bottles {
     }
 }
 
-class BottleNumner {
+class BottleNumber {
 
-    static for<T extends BottleNumner>(number: number): T | BottleNumner {
+    static for<T extends BottleNumber>(number: number): T | BottleNumber {
         let BottleNumberClass;
 
         if (number === 0) {
             BottleNumberClass = BottleNumber0;
         } else if (number === 1) {
             BottleNumberClass = BottleNumber1;
+        } else if (number === 6) {
+            BottleNumberClass = BottleNumber6;
         } else {
-            BottleNumberClass = BottleNumner;
+            BottleNumberClass = BottleNumber;
         }
         return new BottleNumberClass(number);
     }
@@ -46,9 +48,9 @@ class BottleNumner {
     quantity(): string {
         return this.number.toString();
     }
-
+    
     successor() {
-        return BottleNumner.for(this.number - 1);
+        return BottleNumber.for(this.number - 1);
     }
     
     action(): string {
@@ -64,26 +66,35 @@ class BottleNumner {
     }
 }
 
-class BottleNumber0 extends BottleNumner {
+class BottleNumber0 extends BottleNumber {
     quantity(): string {
         return 'no more';
     }
     
     successor() {
-        return BottleNumner.for(99);
+        return BottleNumber.for(99);
     }
-
+    
     action(): string {
         return 'Go to the store and buy some more, ';
     }
 }
 
-class BottleNumber1 extends BottleNumner {
+class BottleNumber1 extends BottleNumber {
     container(): string {
         return 'bottle';
     }
-
+    
     protected pronoun(): string {
         return 'it';
+    }
+}
+class BottleNumber6 extends BottleNumber {
+    container(): string {
+        return 'six-pack';
+    }
+
+    quantity(): string {
+        return '1';
     }
 }
