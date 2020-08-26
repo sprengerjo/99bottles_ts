@@ -35,7 +35,6 @@ export class BottleVerse implements VerseTemplate{
     }
 
     lyrics(): string {
-
         const result = `${this.bottleNumber} of beer on the wall, ` +
             `${this.bottleNumber} of beer.\n` +
             `${this.bottleNumber.action()}` +
