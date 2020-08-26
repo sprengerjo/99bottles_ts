@@ -1,4 +1,4 @@
-import { downTo } from './helpers';
+import { downTo, capitalize } from './helpers';
 
 export class Bottles {
 
@@ -7,37 +7,83 @@ export class Bottles {
     }
     verses(max: number, min: number): string {
         return downTo(max, min)
-            .map(this.verse)
+            .map(number => this.verse(number))
             .join('\n');
     }
     verse(number: number): string {
-        let result;
+        const bottleNumber = BottleNumber.for(number);
 
-        if (number === 0) {
-            result =
-                'No more bottles of beer on the wall, ' +
-                'no more bottles of beer.\n' +
-                'Go to the store and buy some more, ' +
-                '99 bottles of beer on the wall.\n';
-        } else if (number === 1) {
-            result =
-                '1 bottle of beer on the wall, ' +
-                '1 bottle of beer.\n' +
-                'Take it down and pass it around, ' +
-                'no more bottles of beer on the wall.\n';
-        } else if (number === 2) {
-            result =
-                '2 bottles of beer on the wall, ' +
-                '2 bottles of beer.\n' +
-                'Take one down and pass it around, ' +
-                '1 bottle of beer on the wall.\n';
-        } else {
-            result = `${number} bottles of beer on the wall, ` +
-                `${number} bottles of beer.\n` +
-                'Take one down and pass it around, ' +
-                `${number - 1} bottles of beer on the wall.\n`;
-        }
-        return result
+        const result = `${bottleNumber} of beer on the wall, ` +
+            `${bottleNumber} of beer.\n` +
+            `${bottleNumber.action()}` +
+            `${bottleNumber.successor()} of beer on the wall.\n`;
+
+        return capitalize(result)
     }
 }
 
+class BottleNumber {
+
+    static for<T extends BottleNumber>(number: number): T | BottleNumber {
+        let BottleNumberClass;
+
+        if (number === 0) {
+            BottleNumberClass = BottleNumber0;
+        } else if (number === 1) {
+            BottleNumberClass = BottleNumber1;
+        } else {
+            BottleNumberClass = BottleNumber;
+        }
+        return new BottleNumberClass(number);
+    }
+
+    constructor(private number: number) { }
+
+    container(): string {
+        return 'bottles';
+    }
+
+    quantity(): string {
+        return this.number.toString();
+    }
+
+    successor() {
+        return BottleNumber.for(this.number - 1);
+    }
+    
+    action(): string {
+        return `Take ${this.pronoun()} down and pass it around, `;
+    }
+    
+    toString() {
+        return `${this.quantity()} ${this.container()}`;
+    }
+    
+    protected pronoun(): string {
+        return 'one';
+    }
+}
+
+class BottleNumber0 extends BottleNumber {
+    quantity(): string {
+        return 'no more';
+    }
+    
+    successor() {
+        return BottleNumber.for(99);
+    }
+
+    action(): string {
+        return 'Go to the store and buy some more, ';
+    }
+}
+
+class BottleNumber1 extends BottleNumber {
+    container(): string {
+        return 'bottle';
+    }
+
+    protected pronoun(): string {
+        return 'it';
+    }
+}
