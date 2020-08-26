@@ -1,10 +1,14 @@
 import { downTo, capitalize } from './helpers';
 
-export class Bottles {
-    constructor(private verseTemplate = BottleVerse) { }
+export interface VerseTemplate {
+    lyrics: (number: number) => string;
+}
+
+export class CountdownSong {
+    constructor(private verseTemplate: VerseTemplate = BottleVerse, private max = 999999, private min = 0) { }
 
     song(): string {
-        return this.verses(99, 0);
+        return this.verses(this.max, this.min);
     }
     verses(max: number, min: number): string {
         return downTo(max, min)
@@ -16,7 +20,7 @@ export class Bottles {
     }
 }
 
-class BottleVerse {
+export class BottleVerse implements VerseTemplate{
     /**
      *  rigorously separate object creation from object use
      */
@@ -41,21 +45,21 @@ class BottleVerse {
     }
 }
 
-class BottleNumber {
+export class BottleNumber {
 
     static for<T extends BottleNumber>(number: number): T | BottleNumber {
-        let BottleNumberClass;
+        let bottleNumberClass;
 
         if (number === 0) {
-            BottleNumberClass = BottleNumber0;
+            bottleNumberClass = BottleNumber0;
         } else if (number === 1) {
-            BottleNumberClass = BottleNumber1;
+            bottleNumberClass = BottleNumber1;
         } else if (number === 6) {
-            BottleNumberClass = BottleNumber6;
+            bottleNumberClass = BottleNumber6;
         } else {
-            BottleNumberClass = BottleNumber;
+            bottleNumberClass = BottleNumber;
         }
-        return new BottleNumberClass(number);
+        return new bottleNumberClass(number);
     }
 
     constructor(private number: number) { }
@@ -85,7 +89,7 @@ class BottleNumber {
     }
 }
 
-class BottleNumber0 extends BottleNumber {
+export class BottleNumber0 extends BottleNumber {
     quantity(): string {
         return 'no more';
     }
@@ -99,7 +103,7 @@ class BottleNumber0 extends BottleNumber {
     }
 }
 
-class BottleNumber1 extends BottleNumber {
+export class BottleNumber1 extends BottleNumber {
     container(): string {
         return 'bottle';
     }
@@ -108,7 +112,7 @@ class BottleNumber1 extends BottleNumber {
         return 'it';
     }
 }
-class BottleNumber6 extends BottleNumber {
+export class BottleNumber6 extends BottleNumber {
     container(): string {
         return 'six-pack';
     }
