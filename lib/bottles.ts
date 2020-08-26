@@ -1,7 +1,9 @@
 import { downTo, capitalize } from './helpers';
 
 export class Bottles {
-
+    
+    constructor(private verseTemplate = BottleVerse) {}
+    
     song(): string {
         return this.verses(99, 0);
     }
@@ -11,12 +13,29 @@ export class Bottles {
             .join('\n');
     }
     verse(number: number): string {
-        const bottleNumber = BottleNumber.for(number);
+       return this.verseTemplate.lyrics(number);
+    }
+}
 
-        const result = `${bottleNumber} of beer on the wall, ` +
-            `${bottleNumber} of beer.\n` +
-            `${bottleNumber.action()}` +
-            `${bottleNumber.successor()} of beer on the wall.\n`;
+export class BottleVerse {
+    /**
+     *  rigorously separate object creation from object use
+     */
+    static for(number: number) {
+        return new BottleVerse(BottleNumber.for(number));
+    }
+
+    constructor(private bottleNumber: any) { }
+
+    static lyrics(number: number): string {
+        return BottleVerse.for(number).lyrics();
+    }
+
+    lyrics(): string {
+        const result = `${this.bottleNumber} of beer on the wall, ` +
+            `${this.bottleNumber} of beer.\n` +
+            `${this.bottleNumber.action()}` +
+            `${this.bottleNumber.successor()} of beer on the wall.\n`;
 
         return capitalize(result)
     }
