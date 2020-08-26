@@ -1,9 +1,14 @@
 import { downTo, capitalize } from './helpers';
 
-export class Bottles {
+export interface VerseTemplate {
+    lyrics: (number: number) => string;
+}
+
+export class CountdownSong {
+    constructor(private verseTemplate: VerseTemplate = BottleVerse, private max = 999999, private min = 0) { }
 
     song(): string {
-        return this.verses(99, 0);
+        return this.verses(this.max, this.min);
     }
     verses(max: number, min: number): string {
         return downTo(max, min)
@@ -11,30 +16,49 @@ export class Bottles {
             .join('\n');
     }
     verse(number: number): string {
-        const bottleNumber = BottleNumber.for(number);
+        return this.verseTemplate.lyrics(number)
+    }
+}
 
-        const result = `${bottleNumber} of beer on the wall, ` +
-            `${bottleNumber} of beer.\n` +
-            `${bottleNumber.action()}` +
-            `${bottleNumber.successor()} of beer on the wall.\n`;
+export class BottleVerse implements VerseTemplate{
+    /**
+     *  rigorously separate object creation from object use
+     */
+    static for(number: number) {
+        return new BottleVerse(BottleNumber.for(number));
+    }
+
+    constructor(private bottleNumber: any) { }
+
+    static lyrics(number: number): string {
+        return BottleVerse.for(number).lyrics();
+    }
+
+    lyrics(): string {
+        const result = `${this.bottleNumber} of beer on the wall, ` +
+            `${this.bottleNumber} of beer.\n` +
+            `${this.bottleNumber.action()}` +
+            `${this.bottleNumber.successor()} of beer on the wall.\n`;
 
         return capitalize(result)
     }
 }
 
-class BottleNumber {
+export class BottleNumber {
 
     static for<T extends BottleNumber>(number: number): T | BottleNumber {
-        let BottleNumberClass;
+        let bottleNumberClass;
 
         if (number === 0) {
-            BottleNumberClass = BottleNumber0;
+            bottleNumberClass = BottleNumber0;
         } else if (number === 1) {
-            BottleNumberClass = BottleNumber1;
+            bottleNumberClass = BottleNumber1;
+        } else if (number === 6) {
+            bottleNumberClass = BottleNumber6;
         } else {
-            BottleNumberClass = BottleNumber;
+            bottleNumberClass = BottleNumber;
         }
-        return new BottleNumberClass(number);
+        return new bottleNumberClass(number);
     }
 
     constructor(private number: number) { }
@@ -50,25 +74,25 @@ class BottleNumber {
     successor() {
         return BottleNumber.for(this.number - 1);
     }
-    
+
     action(): string {
         return `Take ${this.pronoun()} down and pass it around, `;
     }
-    
+
     toString() {
         return `${this.quantity()} ${this.container()}`;
     }
-    
+
     protected pronoun(): string {
         return 'one';
     }
 }
 
-class BottleNumber0 extends BottleNumber {
+export class BottleNumber0 extends BottleNumber {
     quantity(): string {
         return 'no more';
     }
-    
+
     successor() {
         return BottleNumber.for(99);
     }
@@ -78,12 +102,21 @@ class BottleNumber0 extends BottleNumber {
     }
 }
 
-class BottleNumber1 extends BottleNumber {
+export class BottleNumber1 extends BottleNumber {
     container(): string {
         return 'bottle';
     }
 
     protected pronoun(): string {
         return 'it';
+    }
+}
+export class BottleNumber6 extends BottleNumber {
+    container(): string {
+        return 'six-pack';
+    }
+
+    quantity(): string {
+        return '1';
     }
 }
